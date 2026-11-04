@@ -1,0 +1,373 @@
+! ===== MODUL 4 JARKOM - CIDR (CPT) - Kelompok K-45 =====
+! Konvensi: LAN -> router = IP usable pertama (.1); link point-to-point -> router lebih dekat Cyberia .1, yang lebih jauh .2
+! A3 (Switch9 di CPT): Wired .1, Psyche .2, Copland .3, Schumann .4
+! Nama interface sudah disesuaikan dengan kabel di file CPT-CIDR_MODUL4.pkt. Cyberia Fa0/1 = ke Cloud0 (diatur sesuai skenario cloud).
+
+! ---------- Router Cyberia ----------
+enable
+configure terminal
+hostname Cyberia
+no ip domain-lookup
+interface FastEthernet0/0
+ description A2 10.86.28.144/30
+ ip address 10.86.28.145 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A1 10.86.28.0/25
+ ip address 10.86.28.1 255.255.255.128
+ no shutdown
+ exit
+! Interface ke Cloud0 (NAT/Cloud): atur sesuai skenario cloud (IP/gateway dari dosen/asisten), lalu:
+! Default ke dunia luar: ip route 0.0.0.0 0.0.0.0 <gateway-cloud>
+! via Wired
+ip route 10.86.0.0 255.255.224.0 10.86.28.146
+end
+write memory
+
+! ---------- Router Wired ----------
+enable
+configure terminal
+hostname Wired
+no ip domain-lookup
+interface FastEthernet0/0
+ description A2 10.86.28.144/30
+ ip address 10.86.28.146 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A10 10.86.28.148/30
+ ip address 10.86.28.149 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A14 10.86.28.136/30
+ ip address 10.86.28.137 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/1
+ description A3 10.86.28.128/29
+ ip address 10.86.28.129 255.255.255.248
+ no shutdown
+ exit
+! via Cyberia
+ip route 0.0.0.0 0.0.0.0 10.86.28.145
+! via Cyberia
+ip route 10.86.28.0 255.255.255.128 10.86.28.145
+! via Psyche
+ip route 10.86.8.0 255.255.252.0 10.86.28.130
+! via Copland
+ip route 10.86.12.0 255.255.252.0 10.86.28.131
+! via Schumann
+ip route 10.86.0.0 255.255.248.0 10.86.28.132
+! via Navi
+ip route 10.86.24.0 255.255.252.0 10.86.28.150
+! via Tachibana
+ip route 10.86.16.0 255.255.248.0 10.86.28.138
+end
+write memory
+
+! ---------- Router Psyche ----------
+enable
+configure terminal
+hostname Psyche
+no ip domain-lookup
+interface FastEthernet0/0
+ description A3 10.86.28.128/29
+ ip address 10.86.28.130 255.255.255.248
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A4 10.86.8.0/22
+ ip address 10.86.8.1 255.255.252.0
+ no shutdown
+ exit
+! via Wired
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+end
+write memory
+
+! ---------- Router Copland ----------
+enable
+configure terminal
+hostname Copland
+no ip domain-lookup
+interface FastEthernet0/0
+ description A6 10.86.12.0/23
+ ip address 10.86.12.1 255.255.254.0
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A3 10.86.28.128/29
+ ip address 10.86.28.131 255.255.255.248
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A5 10.86.14.0/26
+ ip address 10.86.14.1 255.255.255.192
+ no shutdown
+ exit
+! via Wired
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+end
+write memory
+
+! ---------- Router Schumann ----------
+enable
+configure terminal
+hostname Schumann
+no ip domain-lookup
+interface FastEthernet0/0
+ description A3 10.86.28.128/29
+ ip address 10.86.28.132 255.255.255.248
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A7 10.86.4.0/29
+ ip address 10.86.4.1 255.255.255.248
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A8 10.86.4.8/30
+ ip address 10.86.4.9 255.255.255.252
+ no shutdown
+ exit
+! via Wired
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+! via Accela
+ip route 10.86.0.0 255.255.252.0 10.86.4.10
+end
+write memory
+
+! ---------- Router Accela ----------
+enable
+configure terminal
+hostname Accela
+no ip domain-lookup
+interface FastEthernet0/0
+ description A8 10.86.4.8/30
+ ip address 10.86.4.10 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A9 10.86.0.0/22
+ ip address 10.86.0.1 255.255.252.0
+ no shutdown
+ exit
+! via Schumann
+ip route 0.0.0.0 0.0.0.0 10.86.4.9
+end
+write memory
+
+! ---------- Router Navi ----------
+enable
+configure terminal
+hostname Navi
+no ip domain-lookup
+interface FastEthernet0/0
+ description A10 10.86.28.148/30
+ ip address 10.86.28.150 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A11 10.86.24.0/24
+ ip address 10.86.24.1 255.255.255.0
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A12 10.86.26.0/26
+ ip address 10.86.26.1 255.255.255.192
+ no shutdown
+ exit
+interface FastEthernet1/1
+ description A13 10.86.25.0/24
+ ip address 10.86.25.1 255.255.255.0
+ no shutdown
+ exit
+! via Wired
+ip route 0.0.0.0 0.0.0.0 10.86.28.149
+end
+write memory
+
+! ---------- Router Tachibana ----------
+enable
+configure terminal
+hostname Tachibana
+no ip domain-lookup
+interface FastEthernet0/0
+ description A14 10.86.28.136/30
+ ip address 10.86.28.138 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A16 10.86.18.0/30
+ ip address 10.86.18.1 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A15 10.86.16.0/23
+ ip address 10.86.16.1 255.255.254.0
+ no shutdown
+ exit
+! via Wired
+ip route 0.0.0.0 0.0.0.0 10.86.28.137
+! via Deus
+ip route 10.86.20.0 255.255.252.0 10.86.18.2
+end
+write memory
+
+! ---------- Router Deus ----------
+enable
+configure terminal
+hostname Deus
+no ip domain-lookup
+interface FastEthernet0/0
+ description A16 10.86.18.0/30
+ ip address 10.86.18.2 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A18 10.86.22.128/30
+ ip address 10.86.22.129 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A17 10.86.22.0/25
+ ip address 10.86.22.1 255.255.255.128
+ no shutdown
+ exit
+! via Tachibana
+ip route 0.0.0.0 0.0.0.0 10.86.18.1
+! via Protocol7
+ip route 10.86.20.0 255.255.254.0 10.86.22.130
+end
+write memory
+
+! ---------- Router Protocol7 ----------
+enable
+configure terminal
+hostname Protocol7
+no ip domain-lookup
+interface FastEthernet0/0
+ description A18 10.86.22.128/30
+ ip address 10.86.22.130 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A20 10.86.21.64/30
+ ip address 10.86.21.65 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A19 10.86.21.0/26
+ ip address 10.86.21.1 255.255.255.192
+ no shutdown
+ exit
+! via Deus
+ip route 0.0.0.0 0.0.0.0 10.86.22.129
+! via Knights
+ip route 10.86.20.0 255.255.255.0 10.86.21.66
+end
+write memory
+
+! ---------- Router Knights ----------
+enable
+configure terminal
+hostname Knights
+no ip domain-lookup
+interface FastEthernet0/0
+ description A20 10.86.21.64/30
+ ip address 10.86.21.66 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A22 10.86.20.136/30
+ ip address 10.86.20.137 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A21 10.86.20.128/29
+ ip address 10.86.20.129 255.255.255.248
+ no shutdown
+ exit
+! via Protocol7
+ip route 0.0.0.0 0.0.0.0 10.86.21.65
+! via Phantoma
+ip route 10.86.20.0 255.255.255.128 10.86.20.138
+end
+write memory
+
+! ---------- Router Phantoma ----------
+enable
+configure terminal
+hostname Phantoma
+no ip domain-lookup
+interface FastEthernet0/0
+ description A22 10.86.20.136/30
+ ip address 10.86.20.138 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A23 10.86.20.0/27
+ ip address 10.86.20.1 255.255.255.224
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A24 10.86.20.32/30
+ ip address 10.86.20.33 255.255.255.252
+ no shutdown
+ exit
+! via Knights
+ip route 0.0.0.0 0.0.0.0 10.86.20.137
+! via Shibuya
+ip route 10.86.20.64 255.255.255.192 10.86.20.34
+end
+write memory
+
+! ---------- Router Shibuya ----------
+enable
+configure terminal
+hostname Shibuya
+no ip domain-lookup
+interface FastEthernet0/0
+ description A24 10.86.20.32/30
+ ip address 10.86.20.34 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A25 10.86.20.64/26
+ ip address 10.86.20.65 255.255.255.192
+ no shutdown
+ exit
+! via Phantoma
+ip route 0.0.0.0 0.0.0.0 10.86.20.33
+end
+write memory
+
+! ===== IP NODE (set Static di tab Config/Desktop > IP Configuration) =====
+Node          IP Address        Subnet Mask       Default Gateway 
+JJ            10.86.28.2        255.255.255.128   10.86.28.1      
+MyuMyu        10.86.28.3        255.255.255.128   10.86.28.1      
+Karl          10.86.8.2         255.255.252.0     10.86.8.1       
+Lin           10.86.8.3         255.255.252.0     10.86.8.1       
+Juri          10.86.14.2        255.255.255.192   10.86.14.1      
+Masayuki      10.86.12.2        255.255.254.0     10.86.12.1      
+Akashic       10.86.4.2         255.255.255.248   10.86.4.1       
+Omnipresence  10.86.0.2         255.255.252.0     10.86.0.1       
+Denpa         10.86.0.3         255.255.252.0     10.86.0.1       
+Alice         10.86.24.2        255.255.255.0     10.86.24.1      
+Reika         10.86.24.3        255.255.255.0     10.86.24.1      
+Taro          10.86.26.2        255.255.255.192   10.86.26.1      
+Yasuo         10.86.25.2        255.255.255.0     10.86.25.1      
+Miho          10.86.25.3        255.255.255.0     10.86.25.1      
+Kuma          10.86.25.4        255.255.255.0     10.86.25.1      
+Collective    10.86.16.2        255.255.254.0     10.86.16.1      
+Ghost         10.86.16.3        255.255.254.0     10.86.16.1      
+Lilith        10.86.22.2        255.255.255.128   10.86.22.1      
+Specter       10.86.22.3        255.255.255.128   10.86.22.1      
+Chisa         10.86.21.2        255.255.255.192   10.86.21.1      
+Hodgeson      10.86.21.3        255.255.255.192   10.86.21.1      
+Eiri          10.86.20.130      255.255.255.248   10.86.20.129    
+Semi          10.86.20.2        255.255.255.224   10.86.20.1      
+Lain          10.86.20.66       255.255.255.192   10.86.20.65     
+Mika          10.86.20.67       255.255.255.192   10.86.20.65     
