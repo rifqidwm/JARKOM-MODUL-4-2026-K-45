@@ -1427,3 +1427,924 @@ ping 10.86.13.2
 
 ## CIDR (Cisco Packet Tracer)
 
+Pada Cisco Packet Tracer, topologi The Wired Expansion dikerjakan dengan metode CIDR. Subnet-subnet yang telah dihitung digabung secara bertahap dari ujung topologi menuju Wired mengikuti susunan router, sehingga setiap cabang menjadi satu blok CIDR yang bisa diwakili oleh satu rute. Perhitungan CIDR dikerjakan oleh Abhista Athallah Dyfan(006), sedangkan VLSM pada GNS3 dikerjakan oleh Rifqi Dwi Muslim(077).
+
+### Daftar Node dan Topologi
+
+| Jumlah | Jenis node | Node |
+| ------ | ---------- | ---- |
+| 13 | Router Cisco 2811 | Cyberia, Wired, Psyche, Copland, Schumann, Accela, Navi, Tachibana, Deus, Protocol7, Knights, Phantoma, Shibuya |
+| 25 | PC-PT, Laptop-PT, Server-PT | JJ, MyuMyu, Karl, Lin, Juri, Masayuki, Akashic, Omnipresence, Denpa, Alice, Reika, Taro, Yasuo, Miho, Kuma, Collective, Ghost, Lilith, Specter, Chisa, Hodgeson, Eiri, Semi, Lain, Mika |
+| 13 | Switch-PT | Switch0 sampai Switch12 |
+| 1 | Cloud-PT | Cloud0 |
+
+Router yang memiliki lebih dari 2 link (Cyberia, Wired, Copland, Schumann, Navi, Tachibana, Deus, Protocol7, Knights, Phantoma) dipasangi modul **NM-2FE2W** agar tersedia interface `FastEthernet1/0` dan `FastEthernet1/1`. Setiap end device mewakili seluruh host pada node tersebut, sehingga cukup diberi satu alamat IP. Aplikasi yang dipakai adalah Cisco Packet Tracer 9.0.1.
+
+**TOPOLOGI JARINGAN:**
+
+<br>
+
+![alt text](<Screenshot 2026-11-05 at 09.57.22.png>)
+
+
+*Gambar 9. Topologi The Wired Expansion pada Cisco Packet Tracer*
+
+
+<br>
+
+---
+
+### Rancangan Pengalamatan IP
+
+Prefix kelompok tetap **`10.86.x.x`**. Hasil perhitungan CIDR menghasilkan root **`10.86.0.0/19`** (`255.255.224.0`) yang dibagi menjadi 25 subnet. Jumlah IP dan netmask setiap subnet sama dengan VLSM, sedangkan Network ID berbeda karena subnet ditempatkan berdasarkan penggabungan blok. Alamat terakhir yang terpakai adalah `10.86.28.151`.
+
+| Subnet | Rute | Jumlah IP | Network ID | Netmask | Broadcast | Range IP |
+| ------ | ---- | --------- | ---------- | ------- | --------- | -------- |
+| A1 | Cyberia > JJ, MyuMyu | 126 | 10.86.28.0/25 | 255.255.255.128 | 10.86.28.127 | 10.86.28.1 - 10.86.28.126 |
+| A2 | Cyberia > Wired | 2 | 10.86.28.144/30 | 255.255.255.252 | 10.86.28.147 | 10.86.28.145 - 10.86.28.146 |
+| A3 | Wired > Switch2 > Psyche, Copland, Schumann | 4 | 10.86.28.128/29 | 255.255.255.248 | 10.86.28.135 | 10.86.28.129 - 10.86.28.134 |
+| A4 | Psyche > Switch3 > Karl, Lin | 881 | 10.86.8.0/22 | 255.255.252.0 | 10.86.11.255 | 10.86.8.1 - 10.86.11.254 |
+| A5 | Copland > Juri | 32 | 10.86.14.0/26 | 255.255.255.192 | 10.86.14.63 | 10.86.14.1 - 10.86.14.62 |
+| A6 | Copland > Switch4 > Masayuki | 301 | 10.86.12.0/23 | 255.255.254.0 | 10.86.13.255 | 10.86.12.1 - 10.86.13.254 |
+| A7 | Schumann > Akashic | 4 | 10.86.4.0/29 | 255.255.255.248 | 10.86.4.7 | 10.86.4.1 - 10.86.4.6 |
+| A8 | Schumann > Accela | 2 | 10.86.4.8/30 | 255.255.255.252 | 10.86.4.11 | 10.86.4.9 - 10.86.4.10 |
+| A9 | Accela > Switch5 > Omnipresence, Denpa | 514 | 10.86.0.0/22 | 255.255.252.0 | 10.86.3.255 | 10.86.0.1 - 10.86.3.254 |
+| A10 | Wired > Navi | 2 | 10.86.28.148/30 | 255.255.255.252 | 10.86.28.151 | 10.86.28.149 - 10.86.28.150 |
+| A11 | Navi > Switch6 > Alice, Reika | 254 | 10.86.24.0/24 | 255.255.255.0 | 10.86.24.255 | 10.86.24.1 - 10.86.24.254 |
+| A12 | Navi > Switch7 > Taro | 58 | 10.86.26.0/26 | 255.255.255.192 | 10.86.26.63 | 10.86.26.1 - 10.86.26.62 |
+| A13 | Navi > Switch8 > Yasuo, Miho, Kuma | 143 | 10.86.25.0/24 | 255.255.255.0 | 10.86.25.255 | 10.86.25.1 - 10.86.25.254 |
+| A14 | Wired > Tachibana | 2 | 10.86.28.136/30 | 255.255.255.252 | 10.86.28.139 | 10.86.28.137 - 10.86.28.138 |
+| A15 | Tachibana > Switch9 > Collective, Ghost | 267 | 10.86.16.0/23 | 255.255.254.0 | 10.86.17.255 | 10.86.16.1 - 10.86.17.254 |
+| A16 | Tachibana > Deus | 2 | 10.86.18.0/30 | 255.255.255.252 | 10.86.18.3 | 10.86.18.1 - 10.86.18.2 |
+| A17 | Deus > Switch10 > Lilith, Specter | 99 | 10.86.22.0/25 | 255.255.255.128 | 10.86.22.127 | 10.86.22.1 - 10.86.22.126 |
+| A18 | Deus > Protocol7 | 2 | 10.86.22.128/30 | 255.255.255.252 | 10.86.22.131 | 10.86.22.129 - 10.86.22.130 |
+| A19 | Protocol7 > Switch11 > Chisa, Hodgeson | 33 | 10.86.21.0/26 | 255.255.255.192 | 10.86.21.63 | 10.86.21.1 - 10.86.21.62 |
+| A20 | Protocol7 > Knights | 2 | 10.86.21.64/30 | 255.255.255.252 | 10.86.21.67 | 10.86.21.65 - 10.86.21.66 |
+| A21 | Knights > Eiri | 3 | 10.86.20.128/29 | 255.255.255.248 | 10.86.20.135 | 10.86.20.129 - 10.86.20.134 |
+| A22 | Knights > Phantoma | 2 | 10.86.20.136/30 | 255.255.255.252 | 10.86.20.139 | 10.86.20.137 - 10.86.20.138 |
+| A23 | Phantoma > Switch12 > Semi | 15 | 10.86.20.0/27 | 255.255.255.224 | 10.86.20.31 | 10.86.20.1 - 10.86.20.30 |
+| A24 | Phantoma > Shibuya | 2 | 10.86.20.32/30 | 255.255.255.252 | 10.86.20.35 | 10.86.20.33 - 10.86.20.34 |
+| A25 | Shibuya > Switch13 > Lain, Mika | 62 | 10.86.20.64/26 | 255.255.255.192 | 10.86.20.127 | 10.86.20.65 - 10.86.20.126 |
+
+Link Cyberia ke Cloud0 berada di luar prefix kelompok, sehingga tidak dihitung sebagai subnet.
+
+---
+
+### Urutan Pengerjaan
+
+1. Subnet diidentifikasi dari topologi, lalu Jumlah IP dan netmask setiap subnet dihitung (sama dengan Bagian 1 dan 2 pada VLSM).
+2. Subnet digabung secara bertahap sampai menjadi satu blok root `/19`.
+3. Root dibagi kembali dari atas ke bawah untuk menetapkan Network ID setiap subnet.
+4. Alamat IP dibagikan ke setiap interface router dan end device.
+5. Topologi dibangun di Cisco Packet Tracer, termasuk pemasangan modul dan pemilihan jenis kabel.
+6. Setiap router dikonfigurasi melalui CLI, lalu end device melalui **Desktop > IP Configuration**.
+7. Rute statis disusun dengan summarization sesuai blok hasil penggabungan.
+8. Konektivitas diuji dengan `ping` dan `tracert` dari end device pada jalur terjauh.
+
+---
+
+### BAGIAN 1, IDENTIFIKASI SUBNET DAN KEBUTUHAN IP
+
+Identifikasi subnet, Jumlah IP, netmask setiap subnet, dan netmask root (`/19`) sama dengan **Bagian 1 dan Bagian 2** pada VLSM karena keduanya bergantung pada topologi yang sama. Total ukuran blok adalah 4188 alamat sehingga netmask root yang dipakai adalah `/19`.
+
+**Hasil:**
+
+- 25 subnet dengan total ukuran blok 4188 alamat, melebihi 4096 sehingga `/20` tidak cukup.
+- Netmask root adalah **`/19`** dengan rentang `10.86.0.0` sampai `10.86.31.255`.
+
+---
+
+### BAGIAN 2, PENGGABUNGAN SUBNET
+
+Soal meminta pembagian IP dengan metode CIDR, sehingga subnet digabung dari bawah ke atas sampai menjadi satu blok.
+
+Aturan penggabungan: dua subnet digabung menjadi satu blok yang cukup menampung keduanya. Ukuran blok gabungan adalah dua kali blok terbesar dari kedua subnet, sehingga:
+
+```
+netmask gabungan = netmask terkecil dari kedua subnet - 1
+```
+
+Contoh: `/30` digabung `/23` menjadi `/22`, dan `/26` digabung `/26` menjadi `/25`. Pasangan dipilih berdasarkan subnet yang bertetangga pada topologi, mulai dari ujung cabang menuju Wired, sehingga setiap cabang router menjadi satu blok.
+
+| Level | Subnet | Gabungan dari | Netmask Akhir |
+| ----- | ------ | ------------- | ------------- |
+| I | B1 | A24 (/30) + A23 (/27) | /26 |
+| I | B2 | A22 (/30) + A21 (/29) | /28 |
+| I | B3 | A20 (/30) + A19 (/26) | /25 |
+| I | B4 | A18 (/30) + A17 (/25) | /24 |
+| I | B5 | A16 (/30) + A15 (/23) | /22 |
+| I | B6 | A7 (/29) + A8 (/30) | /28 |
+| I | B7 | A5 (/26) + A6 (/23) | /22 |
+| I | B8 | A11 (/24) + A13 (/24) | /23 |
+| I | B9 | A3 (/29) + A14 (/30) | /28 |
+| I | B10 | A2 (/30) + A10 (/30) | /29 |
+| II | C1 | B1 (/26) + A25 (/26) | /25 |
+| II | C2 | B6 (/28) + A9 (/22) | /21 |
+| II | C3 | B8 (/23) + A12 (/26) | /22 |
+| II | C4 | B9 (/28) + B10 (/29) | /27 |
+| II | C5 | A4 (/22) + B7 (/22) | /21 |
+| III | D1 | B2 (/28) + C1 (/25) | /24 |
+| III | D2 | C4 (/27) + A1 (/25) | /24 |
+| III | D3 | C2 (/21) + C5 (/21) | /20 |
+| IV | E1 | B3 (/25) + D1 (/24) | /23 |
+| IV | E2 | C3 (/22) + D2 (/24) | /21 |
+| V | F1 | B4 (/24) + E1 (/23) | /22 |
+| VI | G1 | B5 (/22) + F1 (/22) | /21 |
+| VII | H1 | G1 (/21) + E2 (/21) | /20 |
+| VIII | I1 | D3 (/20) + H1 (/20) | /19 |
+
+<br>
+
+![Pohon penggabungan CIDR K-45 dengan root 10.86.0.0/19](assets/pohon-cidr.png)
+
+*Gambar 10. Pohon penggabungan CIDR K-45 dengan root 10.86.0.0/19*
+
+<br>
+
+Cara membaca pohon:
+
+1. Elips kuning adalah subnet A1 sampai A25, sedangkan kotak biru adalah blok hasil penggabungan.
+2. Cabang Tachibana sampai Shibuya menjadi satu rantai blok (`/21` > `/22` > `/23` > `/24` > `/25`) karena setiap router hanya memiliki satu router di bawahnya.
+3. Cabang Psyche, Copland, dan Schumann menjadi blok `/20`, cabang Navi menjadi `/22`, dan A1 digabung dengan empat subnet di sekitar Wired (A2, A3, A10, A14) menjadi `/24`.
+
+**Hasil:**
+
+- 25 subnet tergabung menjadi satu blok `I1` dengan netmask **`/19`**, sama dengan hasil perhitungan root pada Bagian 1.
+- Pada penggabungan berukuran berbeda, blok gabungan menyisakan ruang yang tidak terpakai, dan itu menjadi harga dari rute yang lebih ringkas.
+- Hasil penggabungan diisikan ke sheet `Penggabungan - CIDR` pada template spreadsheet.
+
+---
+
+### BAGIAN 3, PEMBAGIAN IP DARI ROOT
+
+Setelah penggabungan, Network ID setiap subnet ditetapkan dari atas ke bawah. Root `10.86.0.0/19` dibelah menjadi dua blok, lalu setiap blok dibelah lagi sesuai pasangan penggabungannya. Pada setiap pembelahan, blok yang lebih besar menempati alamat yang lebih rendah sehingga setiap blok jatuh pada batas yang valid.
+
+| Blok | Gabungan dari | Network ID | Isi |
+| ---- | ------------- | ---------- | --- |
+| I1 | D3 + H1 | 10.86.0.0/19 | seluruh subnet |
+| H1 | G1 + E2 | 10.86.16.0/20 | A1, A2, A3, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25 |
+| G1 | B5 + F1 | 10.86.16.0/21 | A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25 |
+| F1 | B4 + E1 | 10.86.20.0/22 | A17, A18, A19, A20, A21, A22, A23, A24, A25 |
+| E1 | B3 + D1 | 10.86.20.0/23 | A19, A20, A21, A22, A23, A24, A25 |
+| E2 | C3 + D2 | 10.86.24.0/21 | A1, A2, A3, A10, A11, A12, A13, A14 |
+| D1 | B2 + C1 | 10.86.20.0/24 | A21, A22, A23, A24, A25 |
+| D2 | C4 + A1 | 10.86.28.0/24 | A1, A2, A3, A10, A14 |
+| D3 | C2 + C5 | 10.86.0.0/20 | A4, A5, A6, A7, A8, A9 |
+| C1 | B1 + A25 | 10.86.20.0/25 | A23, A24, A25 |
+| C2 | B6 + A9 | 10.86.0.0/21 | A7, A8, A9 |
+| C3 | B8 + A12 | 10.86.24.0/22 | A11, A12, A13 |
+| C4 | B9 + B10 | 10.86.28.128/27 | A2, A3, A10, A14 |
+| C5 | A4 + B7 | 10.86.8.0/21 | A4, A5, A6 |
+| B1 | A24 + A23 | 10.86.20.0/26 | A23, A24 |
+| B2 | A22 + A21 | 10.86.20.128/28 | A21, A22 |
+| B3 | A20 + A19 | 10.86.21.0/25 | A19, A20 |
+| B4 | A18 + A17 | 10.86.22.0/24 | A17, A18 |
+| B5 | A16 + A15 | 10.86.16.0/22 | A15, A16 |
+| B6 | A7 + A8 | 10.86.4.0/28 | A7, A8 |
+| B7 | A5 + A6 | 10.86.12.0/22 | A5, A6 |
+| B8 | A11 + A13 | 10.86.24.0/23 | A11, A13 |
+| B9 | A3 + A14 | 10.86.28.128/28 | A3, A14 |
+| B10 | A2 + A10 | 10.86.28.144/29 | A2, A10 |
+
+**Hasil:**
+
+- Seluruh 25 subnet mendapat Network ID tanpa tumpang tindih dan berada di dalam blok gabungannya.
+- Rentang yang terpakai adalah `10.86.0.0` sampai `10.86.28.151`, dengan sisa alamat `10.86.28.152` sampai `10.86.31.255` yang tidak terpakai.
+- Hasil pembagian diisikan ke sheet `Pembagian IP - CIDR` pada template spreadsheet.
+
+---
+
+### BAGIAN 4, PENGALAMATAN INTERFACE ROUTER DAN END DEVICE
+
+Aturan pengalamatan sama dengan VLSM: router yang lebih dekat ke Cyberia mendapat IP usable pertama pada link antar-router, urutan segmen bersama A3 adalah Wired, Psyche, Copland, lalu Schumann, dan interface router pada subnet LAN mendapat IP usable pertama sebagai gateway.
+
+**Interface router:**
+
+| Router | Interface | Terhubung ke | Subnet | IP Address | Netmask |
+| ------ | --------- | ------------ | ------ | ---------- | ------- |
+| Cyberia | FastEthernet0/1 | Cloud0 | - | - | - |
+| Cyberia | FastEthernet0/0 | Wired | A2 | 10.86.28.145 | 255.255.255.252 |
+| Cyberia | FastEthernet1/0 | Switch0 (JJ, MyuMyu) | A1 | 10.86.28.1 | 255.255.255.128 |
+| Wired | FastEthernet0/0 | Cyberia | A2 | 10.86.28.146 | 255.255.255.252 |
+| Wired | FastEthernet0/1 | Navi | A10 | 10.86.28.149 | 255.255.255.252 |
+| Wired | FastEthernet1/0 | Tachibana | A14 | 10.86.28.137 | 255.255.255.252 |
+| Wired | FastEthernet1/1 | Switch9 | A3 | 10.86.28.129 | 255.255.255.248 |
+| Psyche | FastEthernet0/0 | Switch9 | A3 | 10.86.28.130 | 255.255.255.248 |
+| Psyche | FastEthernet0/1 | Switch10 (Karl, Lin) | A4 | 10.86.8.1 | 255.255.252.0 |
+| Copland | FastEthernet0/0 | Switch11 (Masayuki) | A6 | 10.86.12.1 | 255.255.254.0 |
+| Copland | FastEthernet0/1 | Switch9 | A3 | 10.86.28.131 | 255.255.255.248 |
+| Copland | FastEthernet1/0 | Juri | A5 | 10.86.14.1 | 255.255.255.192 |
+| Schumann | FastEthernet0/0 | Switch9 | A3 | 10.86.28.132 | 255.255.255.248 |
+| Schumann | FastEthernet0/1 | Akashic | A7 | 10.86.4.1 | 255.255.255.248 |
+| Schumann | FastEthernet1/0 | Accela | A8 | 10.86.4.9 | 255.255.255.252 |
+| Accela | FastEthernet0/0 | Schumann | A8 | 10.86.4.10 | 255.255.255.252 |
+| Accela | FastEthernet0/1 | Switch12 (Omnipresence, Denpa) | A9 | 10.86.0.1 | 255.255.252.0 |
+| Navi | FastEthernet0/0 | Wired | A10 | 10.86.28.150 | 255.255.255.252 |
+| Navi | FastEthernet0/1 | Switch1 (Alice, Reika) | A11 | 10.86.24.1 | 255.255.255.0 |
+| Navi | FastEthernet1/0 | Switch2 (Taro) | A12 | 10.86.26.1 | 255.255.255.192 |
+| Navi | FastEthernet1/1 | Switch3 (Kuma, Miho, Yasuo) | A13 | 10.86.25.1 | 255.255.255.0 |
+| Tachibana | FastEthernet0/0 | Wired | A14 | 10.86.28.138 | 255.255.255.252 |
+| Tachibana | FastEthernet0/1 | Deus | A16 | 10.86.18.1 | 255.255.255.252 |
+| Tachibana | FastEthernet1/0 | Switch4 (Collective, Ghost) | A15 | 10.86.16.1 | 255.255.254.0 |
+| Deus | FastEthernet0/0 | Tachibana | A16 | 10.86.18.2 | 255.255.255.252 |
+| Deus | FastEthernet0/1 | Protocol7 | A18 | 10.86.22.129 | 255.255.255.252 |
+| Deus | FastEthernet1/0 | Switch5 (Lilith, Specter) | A17 | 10.86.22.1 | 255.255.255.128 |
+| Protocol7 | FastEthernet0/0 | Deus | A18 | 10.86.22.130 | 255.255.255.252 |
+| Protocol7 | FastEthernet0/1 | Knights | A20 | 10.86.21.65 | 255.255.255.252 |
+| Protocol7 | FastEthernet1/0 | Switch6 (Chisa, Hodgeson) | A19 | 10.86.21.1 | 255.255.255.192 |
+| Knights | FastEthernet0/0 | Protocol7 | A20 | 10.86.21.66 | 255.255.255.252 |
+| Knights | FastEthernet0/1 | Phantoma | A22 | 10.86.20.137 | 255.255.255.252 |
+| Knights | FastEthernet1/0 | Eiri | A21 | 10.86.20.129 | 255.255.255.248 |
+| Phantoma | FastEthernet0/0 | Knights | A22 | 10.86.20.138 | 255.255.255.252 |
+| Phantoma | FastEthernet0/1 | Switch8 (Semi) | A23 | 10.86.20.1 | 255.255.255.224 |
+| Phantoma | FastEthernet1/0 | Shibuya | A24 | 10.86.20.33 | 255.255.255.252 |
+| Shibuya | FastEthernet0/0 | Phantoma | A24 | 10.86.20.34 | 255.255.255.252 |
+| Shibuya | FastEthernet0/1 | Switch7 (Lain, Mika) | A25 | 10.86.20.65 | 255.255.255.192 |
+
+**End device:**
+
+| End Device | Jumlah Host | Subnet | IP Address | Netmask | Gateway |
+| ---------- | ----------- | ------ | ---------- | ------- | ------- |
+| JJ | 95 | A1 | 10.86.28.2 | 255.255.255.128 | 10.86.28.1 |
+| MyuMyu | 30 | A1 | 10.86.28.3 | 255.255.255.128 | 10.86.28.1 |
+| Karl | 700 | A4 | 10.86.8.2 | 255.255.252.0 | 10.86.8.1 |
+| Lin | 180 | A4 | 10.86.8.3 | 255.255.252.0 | 10.86.8.1 |
+| Juri | 31 | A5 | 10.86.14.2 | 255.255.255.192 | 10.86.14.1 |
+| Masayuki | 300 | A6 | 10.86.12.2 | 255.255.254.0 | 10.86.12.1 |
+| Akashic | 3 | A7 | 10.86.4.2 | 255.255.255.248 | 10.86.4.1 |
+| Omnipresence | 510 | A9 | 10.86.0.2 | 255.255.252.0 | 10.86.0.1 |
+| Denpa | 3 | A9 | 10.86.0.3 | 255.255.252.0 | 10.86.0.1 |
+| Alice | 208 | A11 | 10.86.24.2 | 255.255.255.0 | 10.86.24.1 |
+| Reika | 45 | A11 | 10.86.24.3 | 255.255.255.0 | 10.86.24.1 |
+| Taro | 57 | A12 | 10.86.26.2 | 255.255.255.192 | 10.86.26.1 |
+| Yasuo | 120 | A13 | 10.86.25.2 | 255.255.255.0 | 10.86.25.1 |
+| Miho | 18 | A13 | 10.86.25.3 | 255.255.255.0 | 10.86.25.1 |
+| Kuma | 4 | A13 | 10.86.25.4 | 255.255.255.0 | 10.86.25.1 |
+| Collective | 260 | A15 | 10.86.16.2 | 255.255.254.0 | 10.86.16.1 |
+| Ghost | 6 | A15 | 10.86.16.3 | 255.255.254.0 | 10.86.16.1 |
+| Lilith | 77 | A17 | 10.86.22.2 | 255.255.255.128 | 10.86.22.1 |
+| Specter | 21 | A17 | 10.86.22.3 | 255.255.255.128 | 10.86.22.1 |
+| Chisa | 23 | A19 | 10.86.21.2 | 255.255.255.192 | 10.86.21.1 |
+| Hodgeson | 9 | A19 | 10.86.21.3 | 255.255.255.192 | 10.86.21.1 |
+| Eiri | 2 | A21 | 10.86.20.130 | 255.255.255.248 | 10.86.20.129 |
+| Semi | 14 | A23 | 10.86.20.2 | 255.255.255.224 | 10.86.20.1 |
+| Lain | 57 | A25 | 10.86.20.66 | 255.255.255.192 | 10.86.20.65 |
+| Mika | 4 | A25 | 10.86.20.67 | 255.255.255.192 | 10.86.20.65 |
+
+---
+
+### BAGIAN 5, PEMBUATAN TOPOLOGI PADA CISCO PACKET TRACER
+
+Soal meminta membangun topologi sesuai gambar soal. Seluruh router memakai Cisco 2811, switch memakai Switch-PT, dan Cloud0 dipakai sebagai penghubung Cyberia ke dunia luar.
+
+Pemilihan kabel:
+
+- **Copper Cross-Over** untuk perangkat sejenis, yaitu link antar-router serta Juri, Akashic, dan Eiri yang terhubung langsung ke router.
+- **Copper Straight-Through** untuk router ke switch, switch ke end device, dan Cloud0 ke Cyberia.
+
+| No | Node A | Interface A | Node B | Interface B | Subnet | Kabel |
+| -- | ------ | ----------- | ------ | ----------- | ------ | ----- |
+| 1 | Cloud0 | Ethernet6 | Cyberia | Fa0/1 | - | Straight-through |
+| 2 | Cyberia | Fa1/0 | Switch0 | Fa0/1 | A1 | Straight-through |
+| 3 | JJ | Fa0 | Switch0 | Fa1/1 | A1 | Straight-through |
+| 4 | MyuMyu | Fa0 | Switch0 | Fa2/1 | A1 | Straight-through |
+| 5 | Cyberia | Fa0/0 | Wired | Fa0/0 | A2 | Crossover |
+| 6 | Copland | Fa0/1 | Switch9 | Fa2/1 | A3 | Straight-through |
+| 7 | Switch9 | Fa1/1 | Schumann | Fa0/0 | A3 | Straight-through |
+| 8 | Switch9 | Fa3/1 | Psyche | Fa0/0 | A3 | Straight-through |
+| 9 | Wired | Fa1/1 | Switch9 | Fa0/1 | A3 | Straight-through |
+| 10 | Karl | Fa0 | Switch10 | Fa1/1 | A4 | Straight-through |
+| 11 | Psyche | Fa0/1 | Switch10 | Fa0/1 | A4 | Straight-through |
+| 12 | Switch10 | Fa2/1 | Lin | Fa0 | A4 | Straight-through |
+| 13 | Copland | Fa1/0 | Juri | Fa0 | A5 | Crossover |
+| 14 | Masayuki | Fa0 | Switch11 | Fa0/1 | A6 | Straight-through |
+| 15 | Switch11 | Fa1/1 | Copland | Fa0/0 | A6 | Straight-through |
+| 16 | Akashic | Fa0 | Schumann | Fa0/1 | A7 | Crossover |
+| 17 | Schumann | Fa1/0 | Accela | Fa0/0 | A8 | Crossover |
+| 18 | Omnipresence | Fa0 | Switch12 | Fa0/1 | A9 | Straight-through |
+| 19 | Switch12 | Fa1/1 | Denpa | Fa0 | A9 | Straight-through |
+| 20 | Switch12 | Fa2/1 | Accela | Fa0/1 | A9 | Straight-through |
+| 21 | Wired | Fa0/1 | Navi | Fa0/0 | A10 | Crossover |
+| 22 | Alice | Fa0 | Switch1 | Fa1/1 | A11 | Straight-through |
+| 23 | Navi | Fa0/1 | Switch1 | Fa0/1 | A11 | Straight-through |
+| 24 | Switch1 | Fa2/1 | Reika | Fa0 | A11 | Straight-through |
+| 25 | Navi | Fa1/0 | Switch2 | Fa0/1 | A12 | Straight-through |
+| 26 | Switch2 | Fa1/1 | Taro | Fa0 | A12 | Straight-through |
+| 27 | Navi | Fa1/1 | Switch3 | Fa0/1 | A13 | Straight-through |
+| 28 | Switch3 | Fa1/1 | Kuma | Fa0 | A13 | Straight-through |
+| 29 | Switch3 | Fa2/1 | Miho | Fa0 | A13 | Straight-through |
+| 30 | Switch3 | Fa3/1 | Yasuo | Fa0 | A13 | Straight-through |
+| 31 | Wired | Fa1/0 | Tachibana | Fa0/0 | A14 | Crossover |
+| 32 | Switch4 | Fa1/1 | Collective | Fa0 | A15 | Straight-through |
+| 33 | Switch4 | Fa2/1 | Ghost | Fa0 | A15 | Straight-through |
+| 34 | Tachibana | Fa1/0 | Switch4 | Fa0/1 | A15 | Straight-through |
+| 35 | Tachibana | Fa0/1 | Deus | Fa0/0 | A16 | Crossover |
+| 36 | Deus | Fa1/0 | Switch5 | Fa0/1 | A17 | Straight-through |
+| 37 | Switch5 | Fa1/1 | Lilith | Fa0 | A17 | Straight-through |
+| 38 | Switch5 | Fa2/1 | Specter | Fa0 | A17 | Straight-through |
+| 39 | Deus | Fa0/1 | Protocol7 | Fa0/0 | A18 | Crossover |
+| 40 | Protocol7 | Fa1/0 | Switch6 | Fa0/1 | A19 | Straight-through |
+| 41 | Switch6 | Fa1/1 | Chisa | Fa0 | A19 | Straight-through |
+| 42 | Switch6 | Fa2/1 | Hodgeson | Fa0 | A19 | Straight-through |
+| 43 | Protocol7 | Fa0/1 | Knights | Fa0/0 | A20 | Crossover |
+| 44 | Knights | Fa1/0 | Eiri | Fa0 | A21 | Crossover |
+| 45 | Knights | Fa0/1 | Phantoma | Fa0/0 | A22 | Crossover |
+| 46 | Phantoma | Fa0/1 | Switch8 | Fa0/1 | A23 | Straight-through |
+| 47 | Semi | Fa0 | Switch8 | Fa1/1 | A23 | Straight-through |
+| 48 | Phantoma | Fa1/0 | Shibuya | Fa0/0 | A24 | Crossover |
+| 49 | Shibuya | Fa0/1 | Switch7 | Fa0/1 | A25 | Straight-through |
+| 50 | Switch7 | Fa1/1 | Lain | Fa0 | A25 | Straight-through |
+| 51 | Switch7 | Fa2/1 | Mika | Fa0 | A25 | Straight-through |
+
+**Hasil:**
+
+- Topologi berisi 52 perangkat dan 51 link sesuai gambar soal.
+- Terdapat 12 link crossover dan 39 link straight-through.
+- Penamaan Switch0 sampai Switch12 mengikuti label pada file Packet Tracer.
+
+---
+
+### BAGIAN 6, KONFIGURASI ROUTER
+
+Setiap router dikonfigurasi melalui tab **CLI**. Perintah `ip address` memberi alamat pada interface sesuai Bagian 4, `no shutdown` mengaktifkan interface, dan `ip route <Network ID> <Netmask> <next hop>` membuat rute statis. Baris `write memory` menyimpan konfigurasi ke startup-config.
+
+**Cyberia**
+
+```
+enable
+configure terminal
+hostname Cyberia
+no ip domain-lookup
+interface FastEthernet0/0
+ description A2 10.86.28.144/30
+ ip address 10.86.28.145 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A1 10.86.28.0/25
+ ip address 10.86.28.1 255.255.255.128
+ no shutdown
+ exit
+ip route 10.86.0.0 255.255.224.0 10.86.28.146
+end
+write memory
+```
+
+**Wired**
+
+```
+enable
+configure terminal
+hostname Wired
+no ip domain-lookup
+interface FastEthernet0/0
+ description A2 10.86.28.144/30
+ ip address 10.86.28.146 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A10 10.86.28.148/30
+ ip address 10.86.28.149 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A14 10.86.28.136/30
+ ip address 10.86.28.137 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/1
+ description A3 10.86.28.128/29
+ ip address 10.86.28.129 255.255.255.248
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.28.145
+ip route 10.86.28.0 255.255.255.128 10.86.28.145
+ip route 10.86.8.0 255.255.252.0 10.86.28.130
+ip route 10.86.12.0 255.255.252.0 10.86.28.131
+ip route 10.86.0.0 255.255.248.0 10.86.28.132
+ip route 10.86.24.0 255.255.252.0 10.86.28.150
+ip route 10.86.16.0 255.255.248.0 10.86.28.138
+end
+write memory
+```
+
+**Psyche**
+
+```
+enable
+configure terminal
+hostname Psyche
+no ip domain-lookup
+interface FastEthernet0/0
+ description A3 10.86.28.128/29
+ ip address 10.86.28.130 255.255.255.248
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A4 10.86.8.0/22
+ ip address 10.86.8.1 255.255.252.0
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+end
+write memory
+```
+
+**Copland**
+
+```
+enable
+configure terminal
+hostname Copland
+no ip domain-lookup
+interface FastEthernet0/0
+ description A6 10.86.12.0/23
+ ip address 10.86.12.1 255.255.254.0
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A3 10.86.28.128/29
+ ip address 10.86.28.131 255.255.255.248
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A5 10.86.14.0/26
+ ip address 10.86.14.1 255.255.255.192
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+end
+write memory
+```
+
+**Schumann**
+
+```
+enable
+configure terminal
+hostname Schumann
+no ip domain-lookup
+interface FastEthernet0/0
+ description A3 10.86.28.128/29
+ ip address 10.86.28.132 255.255.255.248
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A7 10.86.4.0/29
+ ip address 10.86.4.1 255.255.255.248
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A8 10.86.4.8/30
+ ip address 10.86.4.9 255.255.255.252
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+ip route 10.86.0.0 255.255.252.0 10.86.4.10
+end
+write memory
+```
+
+**Accela**
+
+```
+enable
+configure terminal
+hostname Accela
+no ip domain-lookup
+interface FastEthernet0/0
+ description A8 10.86.4.8/30
+ ip address 10.86.4.10 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A9 10.86.0.0/22
+ ip address 10.86.0.1 255.255.252.0
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.4.9
+end
+write memory
+```
+
+**Navi**
+
+```
+enable
+configure terminal
+hostname Navi
+no ip domain-lookup
+interface FastEthernet0/0
+ description A10 10.86.28.148/30
+ ip address 10.86.28.150 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A11 10.86.24.0/24
+ ip address 10.86.24.1 255.255.255.0
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A12 10.86.26.0/26
+ ip address 10.86.26.1 255.255.255.192
+ no shutdown
+ exit
+interface FastEthernet1/1
+ description A13 10.86.25.0/24
+ ip address 10.86.25.1 255.255.255.0
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.28.149
+end
+write memory
+```
+
+**Tachibana**
+
+```
+enable
+configure terminal
+hostname Tachibana
+no ip domain-lookup
+interface FastEthernet0/0
+ description A14 10.86.28.136/30
+ ip address 10.86.28.138 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A16 10.86.18.0/30
+ ip address 10.86.18.1 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A15 10.86.16.0/23
+ ip address 10.86.16.1 255.255.254.0
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.28.137
+ip route 10.86.20.0 255.255.252.0 10.86.18.2
+end
+write memory
+```
+
+**Deus**
+
+```
+enable
+configure terminal
+hostname Deus
+no ip domain-lookup
+interface FastEthernet0/0
+ description A16 10.86.18.0/30
+ ip address 10.86.18.2 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A18 10.86.22.128/30
+ ip address 10.86.22.129 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A17 10.86.22.0/25
+ ip address 10.86.22.1 255.255.255.128
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.18.1
+ip route 10.86.20.0 255.255.254.0 10.86.22.130
+end
+write memory
+```
+
+**Protocol7**
+
+```
+enable
+configure terminal
+hostname Protocol7
+no ip domain-lookup
+interface FastEthernet0/0
+ description A18 10.86.22.128/30
+ ip address 10.86.22.130 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A20 10.86.21.64/30
+ ip address 10.86.21.65 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A19 10.86.21.0/26
+ ip address 10.86.21.1 255.255.255.192
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.22.129
+ip route 10.86.20.0 255.255.255.0 10.86.21.66
+end
+write memory
+```
+
+**Knights**
+
+```
+enable
+configure terminal
+hostname Knights
+no ip domain-lookup
+interface FastEthernet0/0
+ description A20 10.86.21.64/30
+ ip address 10.86.21.66 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A22 10.86.20.136/30
+ ip address 10.86.20.137 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A21 10.86.20.128/29
+ ip address 10.86.20.129 255.255.255.248
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.21.65
+ip route 10.86.20.0 255.255.255.128 10.86.20.138
+end
+write memory
+```
+
+**Phantoma**
+
+```
+enable
+configure terminal
+hostname Phantoma
+no ip domain-lookup
+interface FastEthernet0/0
+ description A22 10.86.20.136/30
+ ip address 10.86.20.138 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A23 10.86.20.0/27
+ ip address 10.86.20.1 255.255.255.224
+ no shutdown
+ exit
+interface FastEthernet1/0
+ description A24 10.86.20.32/30
+ ip address 10.86.20.33 255.255.255.252
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.20.137
+ip route 10.86.20.64 255.255.255.192 10.86.20.34
+end
+write memory
+```
+
+**Shibuya**
+
+```
+enable
+configure terminal
+hostname Shibuya
+no ip domain-lookup
+interface FastEthernet0/0
+ description A24 10.86.20.32/30
+ ip address 10.86.20.34 255.255.255.252
+ no shutdown
+ exit
+interface FastEthernet0/1
+ description A25 10.86.20.64/26
+ ip address 10.86.20.65 255.255.255.192
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.86.20.33
+end
+write memory
+```
+
+Pemeriksaan di setiap router:
+
+```
+show ip interface brief
+show ip route
+```
+
+**Hasil:**
+
+- Setiap interface router memegang alamat sesuai tabel Bagian 4 dengan status `up/up`.
+- Link Cyberia ke Cloud0 berada di luar subnet kelompok, sehingga interface `FastEthernet0/1` Cyberia tidak diberi alamat dari prefix kelompok.
+
+---
+
+### BAGIAN 7, KONFIGURASI END DEVICE
+
+Setiap end device diberi alamat statis melalui **Desktop > IP Configuration** dengan pilihan **Static**, lalu diisi IPv4 Address, Subnet Mask, dan Default Gateway. Untuk Server, pengaturan yang sama tersedia pada tab **Config > FastEthernet0**. Nilai setiap end device sesuai tabel end device pada Bagian 4. Contoh pada JJ:
+
+| Kolom | Nilai |
+| ----- | ----- |
+| IPv4 Address | 10.86.28.2 |
+| Subnet Mask | 255.255.255.128 |
+| Default Gateway | 10.86.28.1 |
+
+**Hasil:**
+
+- Ke-25 end device memegang satu alamat IP pada subnet masing-masing dengan gateway ke router subnetnya.
+
+---
+
+### BAGIAN 8, STATIC ROUTING
+
+Menyusun routing seefisien mungkin sehingga seluruh node dapat saling terhubung. Karena setiap cabang sudah menjadi satu blok hasil penggabungan, satu rute summary cukup untuk menjangkau seluruh subnet di belakang satu router.
+
+1. **Cyberia** memakai satu rute `10.86.0.0/19` melalui Wired. Subnet A1 yang terhubung langsung tetap dipilih lewat rute connected karena lebih spesifik.
+2. **Wired** memakai satu default route ke Cyberia dan enam rute spesifik: A1 ke Cyberia, `10.86.8.0/22` ke Psyche, `10.86.12.0/22` ke Copland, `10.86.0.0/21` ke Schumann, `10.86.24.0/22` ke Navi, dan `10.86.16.0/21` ke Tachibana.
+3. **Schumann, Tachibana, Deus, Protocol7, Knights, dan Phantoma** memakai satu default route ke router di atasnya, ditambah satu rute summary ke blok router di bawahnya.
+4. **Psyche, Copland, Accela, Navi, dan Shibuya** cukup memakai satu default route.
+
+| Router | Default Route | Rute Spesifik | Total |
+| ------ | ------------- | ------------- | ----- |
+| Cyberia | - | 1 | 1 |
+| Wired | via Cyberia | 6 | 7 |
+| Psyche | via Wired | 0 | 1 |
+| Copland | via Wired | 0 | 1 |
+| Schumann | via Wired | 1 | 2 |
+| Accela | via Schumann | 0 | 1 |
+| Navi | via Wired | 0 | 1 |
+| Tachibana | via Wired | 1 | 2 |
+| Deus | via Tachibana | 1 | 2 |
+| Protocol7 | via Deus | 1 | 2 |
+| Knights | via Protocol7 | 1 | 2 |
+| Phantoma | via Knights | 1 | 2 |
+| Shibuya | via Phantoma | 0 | 1 |
+| **Total** | | | **25** |
+
+Perintah rute setiap router (sama dengan baris `ip route` pada Bagian 6):
+
+**Cyberia**
+
+```
+ip route 10.86.0.0 255.255.224.0 10.86.28.146
+```
+
+**Wired**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.28.145
+ip route 10.86.28.0 255.255.255.128 10.86.28.145
+ip route 10.86.8.0 255.255.252.0 10.86.28.130
+ip route 10.86.12.0 255.255.252.0 10.86.28.131
+ip route 10.86.0.0 255.255.248.0 10.86.28.132
+ip route 10.86.24.0 255.255.252.0 10.86.28.150
+ip route 10.86.16.0 255.255.248.0 10.86.28.138
+```
+
+**Psyche**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+```
+
+**Copland**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+```
+
+**Schumann**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.28.129
+ip route 10.86.0.0 255.255.252.0 10.86.4.10
+```
+
+**Accela**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.4.9
+```
+
+**Navi**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.28.149
+```
+
+**Tachibana**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.28.137
+ip route 10.86.20.0 255.255.252.0 10.86.18.2
+```
+
+**Deus**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.18.1
+ip route 10.86.20.0 255.255.254.0 10.86.22.130
+```
+
+**Protocol7**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.22.129
+ip route 10.86.20.0 255.255.255.0 10.86.21.66
+```
+
+**Knights**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.21.65
+ip route 10.86.20.0 255.255.255.128 10.86.20.138
+```
+
+**Phantoma**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.20.137
+ip route 10.86.20.64 255.255.255.192 10.86.20.34
+```
+
+**Shibuya**
+
+```
+ip route 0.0.0.0 0.0.0.0 10.86.20.33
+```
+
+**Hasil:**
+
+- Total 25 rute statis untuk 25 subnet, jauh lebih sedikit dibanding VLSM karena setiap cabang diwakili satu rute summary.
+- Wired hanya memiliki 7 rute meskipun menjangkau 25 subnet.
+- `show ip route` pada setiap router menampilkan subnet terhubung langsung (`C`), rute statis (`S`), dan default route (`S*`) sesuai tabel.
+
+---
+
+### BAGIAN 9, PENGUJIAN KONEKSI
+
+Membuktikan seluruh node terkoneksi dan dapat melakukan `ping` ke node lainnya.
+
+Pengujian dilakukan dari **Desktop > Command Prompt** pada end device. Pengujian pertama diambil dari jalur terjauh yang melewati 8 router. TTL awal pada end device Packet Tracer adalah 128 dan setiap router mengurangi TTL sebesar 1, sehingga TTL = 128 - jumlah router.
+
+| No | Asal | Tujuan | IP Tujuan | Jalur | Router | TTL |
+| -- | ---- | ------ | --------- | ----- | ------ | --- |
+| 1 | JJ (A1) | Mika (A25) | 10.86.20.67 | Cyberia > Wired > Tachibana > Deus > Protocol7 > Knights > Phantoma > Shibuya | 8 | 120 |
+
+**Pengujian 1, JJ ke Mika**
+
+```
+ping 10.86.20.67
+```
+
+Hasil yang tercatat: 4 paket terkirim dan 4 paket diterima (0% loss) dengan `TTL=120`.
+
+<br>
+
+![alt text](<Screenshot 2026-11-05 at 11.23.53.png>)
+
+*Gambar 11. Ping JJ (10.86.28.2) ke Mika (10.86.20.67) dengan TTL 120*
+
+<br>
+
+**Pengujian 2, tracert JJ ke Mika**
+
+```
+tracert 10.86.20.67
+```
+
+| Hop | IP | Perangkat |
+| --- | -- | --------- |
+| 1 | 10.86.28.1 | Cyberia |
+| 2 | 10.86.28.146 | Wired |
+| 3 | 10.86.28.138 | Tachibana |
+| 4 | 10.86.18.2 | Deus |
+| 5 | 10.86.22.130 | Protocol7 |
+| 6 | 10.86.21.66 | Knights |
+| 7 | 10.86.20.138 | Phantoma |
+| 8 | 10.86.20.34 | Shibuya |
+| 9 | 10.86.20.67 | Mika |
+
+<br>
+
+
+![alt text](<Screenshot 2026-11-05 at 11.25.15.png>)
+
+*Gambar 12. Tracert JJ ke Mika melewati 8 router*
+
+<br>
+
+**Hasil:**
+
+- `ping` JJ ke Mika berhasil dengan TTL 120, sama dengan 128 dikurangi 8 router pada jalur terjauh.
+- `tracert` menampilkan 8 router dan Mika di hop ke-9, sesuai urutan jalur rancangan routing.
+- Jalur ini melewati Cyberia, Wired, Tachibana, Deus, Protocol7, Knights, Phantoma, dan Shibuya, sehingga rute summary pada router-router tersebut terbukti bekerja.
+
+---
+
+### PERBANDINGAN VLSM DAN CIDR
+
+| Aspek | VLSM (GNS3) | CIDR (Cisco Packet Tracer) |
+| ----- | ----------- | -------------------------- |
+| Root | 10.86.0.0/19 | 10.86.0.0/19 |
+| Cara menentukan Network ID | Blok diurutkan dari yang terbesar lalu ditempatkan berurutan | Subnet digabung menjadi blok bersarang lalu dibelah dari root |
+| Network ID A1 | 10.86.14.0/25 | 10.86.28.0/25 |
+| Network ID A4 | 10.86.0.0/22 | 10.86.8.0/22 |
+| Alamat terakhir yang terpakai | 10.86.16.91 | 10.86.28.151 |
+| Jumlah rute statis | banyak, satu rute per subnet di belakang router | 25, satu rute summary per cabang |
