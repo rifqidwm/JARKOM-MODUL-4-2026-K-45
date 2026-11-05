@@ -1441,14 +1441,13 @@ Pada Cisco Packet Tracer, topologi The Wired Expansion dikerjakan dengan metode 
 Router yang memiliki lebih dari 2 link (Cyberia, Wired, Copland, Schumann, Navi, Tachibana, Deus, Protocol7, Knights, Phantoma) dipasangi modul **NM-2FE2W** agar tersedia interface `FastEthernet1/0` dan `FastEthernet1/1`. Setiap end device mewakili seluruh host pada node tersebut, sehingga cukup diberi satu alamat IP. Aplikasi yang dipakai adalah Cisco Packet Tracer 9.0.1.
 
 **TOPOLOGI JARINGAN:**
-
 <br>
 
-![alt text](<Screenshot 2026-11-05 at 09.57.22.png>)
+![alt text](assets/topologi-cpt-cidr.png)
 
+![alt text](assets/pembagian-cpt-subnet-cidr.png)
 
 *Gambar 9. Topologi The Wired Expansion pada Cisco Packet Tracer*
-
 
 <br>
 
@@ -1555,7 +1554,7 @@ Contoh: `/30` digabung `/23` menjadi `/22`, dan `/26` digabung `/26` menjadi `/2
 
 <br>
 
-![Pohon penggabungan CIDR K-45 dengan root 10.86.0.0/19](assets/pohon-cidr.png)
+![alt text](assets/mermaid-diagram-cidr.png)
 
 *Gambar 10. Pohon penggabungan CIDR K-45 dengan root 10.86.0.0/19*
 
@@ -2297,7 +2296,7 @@ Hasil yang tercatat: 4 paket terkirim dan 4 paket diterima (0% loss) dengan `TTL
 
 <br>
 
-![alt text](<Screenshot 2026-11-05 at 11.23.53.png>)
+![alt text](assets/ping-jj-mika-cidr.png)
 
 *Gambar 11. Ping JJ (10.86.28.2) ke Mika (10.86.20.67) dengan TTL 120*
 
@@ -2324,7 +2323,8 @@ tracert 10.86.20.67
 <br>
 
 
-![alt text](<Screenshot 2026-11-05 at 11.25.15.png>)
+![alt text](assets/tracert-jj-mika-cidr.png)
+
 
 *Gambar 12. Tracert JJ ke Mika melewati 8 router*
 
